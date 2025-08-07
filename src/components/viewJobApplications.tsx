@@ -6,6 +6,7 @@ import { Badge } from "./ui/badge";
 import { LoaderPinwheelIcon } from "lucide-react";
 import { Application, Company, Openings, User } from "../../generated/prisma";
 import { UserContext } from "@/app/(protected)/layout";
+import DeleteApplicationBtn from "./deleteApplicationBtn";
 
 export default function ViewJobApplications({ job, refreshTrigger }:{
     job: Openings& {company: Company}
@@ -33,12 +34,16 @@ export default function ViewJobApplications({ job, refreshTrigger }:{
         getApplications();
     }, [job.id, refreshTrigger]);
 
+    const handleDeleteSuccess = (deletedApplicationId: string) => {
+        setApplicants(prev => prev.filter(app => app.id !== deletedApplicationId));
+    };
+
     if(user?.company.id!=job.company_id)return null;
     
     return (
         <Dialog>
             <DialogTrigger>view job applicants</DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>Job Applicants</DialogTitle>
                     <DialogDescription>
@@ -48,11 +53,27 @@ export default function ViewJobApplications({ job, refreshTrigger }:{
                         )}
                     </DialogDescription>
                 </DialogHeader>
-                <div className="mt-4">
+                <div className="mt-4 space-y-3">
                     {applicants.map(application => {
-                        return <Card key={application.id} className="p-3 mb-2">
-                            <Badge className="ml-3">{application.user.email}</Badge>
-                        </Card>
+                        return (
+                            <Card key={application.id} className="p-4">
+                                <div className="flex justify-between items-center">
+                                    <div className="flex-1">
+                                        <Badge className="mb-2">{application.user.email}</Badge>
+                                        <p className="text-sm text-muted-foreground">
+                                            Applied on {new Date(application.id).toLocaleDateString()}
+                                        </p>
+                                    </div>
+                                    <DeleteApplicationBtn 
+                                        applicationId={application.id}
+                                        onDeleteSuccess={() => handleDeleteSuccess(application.id)}
+                                        variant="outline"
+                                        size="sm"
+                                        className="text-destructive hover:text-destructive"
+                                    />
+                                </div>
+                            </Card>
+                        );
                     })}
                 </div>
             </DialogContent>

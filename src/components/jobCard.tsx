@@ -1,13 +1,39 @@
+'use client'
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Building2, Clock } from "lucide-react";
 import Link from "next/link";
 import { Openings, Company } from "../../generated/prisma";
+import SaveJobBtn from "./saveJobBtn";
+import { useState, useEffect } from "react";
 
 type OpeningWithCompany = Openings & { company: Company };
 
 export default function JobCard({ job }: { job: OpeningWithCompany }) {
+  const [isSaved, setIsSaved] = useState(false);
+
+  useEffect(() => {
+    async function checkIfSaved() {
+      try {
+        const res = await fetch(`/api/job/save/${job.id}`, {
+          method: 'GET'
+        });
+        const data = await res.json();
+        if (data.success) {
+          setIsSaved(data.isSaved || false);
+        }
+      } catch (error) {
+        console.error("Error checking saved status:", error);
+      }
+    }
+    checkIfSaved();
+  }, [job.id]);
+
+  const handleSaveSuccess = () => {
+    setIsSaved(!isSaved);
+  };
+
   return (
     <Card className="card-shadow w-full h-full flex flex-col group hover:scale-[1.02] transition-all duration-300">
       <CardHeader className="pb-4">
@@ -21,9 +47,21 @@ export default function JobCard({ job }: { job: OpeningWithCompany }) {
               <span className="truncate font-medium">{job.company.title}</span>
             </div>
           </div>
-          <Badge variant="outline" className="shrink-0 border-primary/20 text-primary">
-            {job.job_type}
-          </Badge>
+          <div className="flex flex-col gap-2 items-end">
+            <Badge variant="outline" className="shrink-0 border-primary/20 text-primary">
+              {job.job_type}
+            </Badge>
+            <div onClick={(e) => e.stopPropagation()}>
+              <SaveJobBtn 
+                job={job}
+                isSaved={isSaved}
+                onSaveSuccess={handleSaveSuccess}
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+              />
+            </div>
+          </div>
         </div>
       </CardHeader>
       

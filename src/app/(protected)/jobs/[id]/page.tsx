@@ -1,11 +1,12 @@
 "use client"
 import EditDelete from "@/components/edit-delete-company";
 import JobApplyButton from "@/components/jobApplyBtn";
+import SaveJobBtn from "@/components/saveJobBtn";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import ViewJobApplications from "@/components/viewJobApplications";
-import { MapPin, Save, Send } from "lucide-react";
+import { MapPin, Send } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { LoadingPage } from "@/components/ui/loading";
@@ -15,6 +16,7 @@ export default function Page() {
     const id = params.id as string;
     const [job, setJob] = useState<any>(null);
     const [hasApplied, setHasApplied] = useState(false);
+    const [isSaved, setIsSaved] = useState(false);
     const [loading, setLoading] = useState(true);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -34,13 +36,30 @@ export default function Page() {
             }
         }
 
+        async function checkIfSaved() {
+            try {
+                const res = await fetch(`/api/job/save/${id}`, {
+                    method: 'GET'
+                });
+                const data = await res.json();
+                setIsSaved(data.isSaved || false);
+            } catch (error) {
+                console.error("Error checking saved status:", error);
+            }
+        }
+
         if (id) {
             fetchJob();
+            checkIfSaved();
         }
     }, [id]);
 
     const handleApplicationSuccess = () => {
         setRefreshTrigger(prev => prev + 1);
+    };
+
+    const handleSaveSuccess = () => {
+        setIsSaved(!isSaved);
     };
 
     if (loading) {
@@ -59,7 +78,11 @@ export default function Page() {
                         <CardTitle className="font-semibold text-2xl">{job.title}</CardTitle>
 
                         <div className="ml-auto flex gap-3 items-center">
-                            <Button variant="secondary" className="flex"><Save />Save</Button>
+                            <SaveJobBtn 
+                                job={job}
+                                isSaved={isSaved}
+                                onSaveSuccess={handleSaveSuccess}
+                            />
                             <JobApplyButton 
                                 job={job} 
                                 hasApplied={hasApplied}

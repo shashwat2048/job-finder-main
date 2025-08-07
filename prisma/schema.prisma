@@ -35,6 +35,7 @@ model Openings {
   company_id      String  @db.ObjectId
   company         Company @relation(fields: [company_id], references: [id])
   applications    Application[]
+  savedJobs       SavedJob[]
 }
 
 model User {
@@ -45,6 +46,7 @@ model User {
   company  Company?
   review   Review[]
   application Application[]
+  savedJobs SavedJob[]
 }
 
 model Company {
@@ -70,4 +72,13 @@ model Application{
   user       User   @relation(fields: [user_id], references: [id])
   job_id   String @db.ObjectId
   job Openings @relation(fields: [job_id], references: [id])
+}
+
+model SavedJob {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  user_id    String @db.ObjectId
+  user       User   @relation(fields: [user_id], references: [id])
+  job_id     String @db.ObjectId
+  job        Openings @relation(fields: [job_id], references: [id])
+  created_at DateTime @default(now())
 }

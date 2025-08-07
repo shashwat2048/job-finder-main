@@ -11,7 +11,7 @@ import {
     DropdownMenuShortcut,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { User2 } from "lucide-react"
+import { User2, Bookmark } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useContext } from "react"
@@ -73,11 +73,17 @@ export function HeaderDropdown() {
                         </Link>
                     </DropdownMenuItem>
                 }
-                    <DropdownMenuItem>
-                        <Link href={"/applied-jobs"}>
-                            View Applied Jobs
-                        </Link>
-                    </DropdownMenuItem>
+                <DropdownMenuItem>
+                    <Link href={"/applied-jobs"}>
+                        View Applied Jobs
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                    <Link href={"/saved-jobs"} className="flex items-center gap-2">
+                        <Bookmark className="h-4 w-4" />
+                        Saved Jobs
+                    </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                     Log out
