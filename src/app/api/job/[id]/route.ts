@@ -9,6 +9,7 @@ export async function GET(req:NextRequest, {params}:{
 }){
     const pr = await params
     const id = pr.id;
+    const user = await getUserFromCookies();
 
     try{
         const job = await db.openings.findUnique({
@@ -17,13 +18,20 @@ export async function GET(req:NextRequest, {params}:{
             },
             include:{
                 company: true,
+                applications: {
+                    where: user ? {
+                        user_id: user.id
+                    } : undefined
+                }
             }
         }
         )
+
         if(job){
             return NextResponse.json({
                 success: true,
                 data: job,
+                hasApplied: job.applications?.length > 0
             })
         }else{
             return NextResponse.json({

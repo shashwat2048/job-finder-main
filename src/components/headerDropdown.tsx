@@ -47,7 +47,6 @@ export function HeaderDropdown() {
                 <DropdownMenuGroup>
                     <DropdownMenuItem>
                         Profile
-                        <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
@@ -74,9 +73,15 @@ export function HeaderDropdown() {
                         </Link>
                     </DropdownMenuItem>
                 }
+                    <DropdownMenuItem>
+                        <Link href={"/applied-jobs"}>
+                            View Applied Jobs
+                        </Link>
+                    </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                     Log out
-                    <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                    {/* <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut> */}
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

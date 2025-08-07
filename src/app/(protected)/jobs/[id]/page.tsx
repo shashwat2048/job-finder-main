@@ -14,6 +14,7 @@ export default function Page() {
     const params = useParams();
     const id = params.id as string;
     const [job, setJob] = useState<any>(null);
+    const [hasApplied, setHasApplied] = useState(false);
     const [loading, setLoading] = useState(true);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -24,6 +25,7 @@ export default function Page() {
                 const data = await res.json();
                 if (data.success) {
                     setJob(data.data);
+                    setHasApplied(data.hasApplied);
                 }
             } catch (error) {
                 console.error("Error fetching job:", error);
@@ -58,7 +60,14 @@ export default function Page() {
 
                         <div className="ml-auto flex gap-3 items-center">
                             <Button variant="secondary" className="flex"><Save />Save</Button>
-                            <JobApplyButton job={job} onApplicationSuccess={handleApplicationSuccess}/>
+                            <JobApplyButton 
+                                job={job} 
+                                hasApplied={hasApplied}
+                                onApplicationSuccess={() => {
+                                    setHasApplied(true);
+                                    setRefreshTrigger(prev => prev + 1);
+                                }}
+                            />
                             <ViewJobApplications job={job} refreshTrigger={refreshTrigger}/>
 
                         </div>

@@ -8,35 +8,18 @@ import { useContext } from "react";
 import { UserContext } from "@/app/(protected)/layout";
 import { Loading } from "./ui/loading";
 
-export default function JobApplyButton({ job, onApplicationSuccess }:{
+export default function JobApplyButton({ 
+    job, 
+    hasApplied: initialHasApplied = false,
+    onApplicationSuccess 
+}: {
     job: Openings
+    hasApplied?: boolean
     onApplicationSuccess?: () => void
 }) {
     const [loading, setLoading] = useState(false);
-    const [hasApplied, setHasApplied] = useState(false);
-    const [checkingStatus, setCheckingStatus] = useState(true);
+    const [hasApplied, setHasApplied] = useState(initialHasApplied);
     const { user } = useContext(UserContext);
-    
-    useEffect(() => {
-        async function checkApplicationStatus() {
-            if (!user) {
-                setCheckingStatus(false);
-                return;
-            }
-
-            try {
-                const res = await fetch(`/api/job/apply/${job.id}/status`);
-                const data = await res.json();
-                setHasApplied(data.hasApplied);
-            } catch (error) {
-                console.error("Error checking application status:", error);
-            } finally {
-                setCheckingStatus(false);
-            }
-        }
-
-        checkApplicationStatus();
-    }, [job.id, user]);
 
     async function handleSubmit() {
         setLoading(true);
@@ -51,7 +34,6 @@ export default function JobApplyButton({ job, onApplicationSuccess }:{
             if (data.success) {
                 toast.success(data.message || "Applied successfully");
                 setHasApplied(true);
-                // Call the success callback to refresh applications list
                 onApplicationSuccess?.();
             } else {
                 toast.error(data.message || "Can't apply for the Job");
@@ -63,14 +45,6 @@ export default function JobApplyButton({ job, onApplicationSuccess }:{
             setLoading(false);
         }
     }   
-
-    if (checkingStatus) {
-        return (
-            <Button variant="secondary" className="flex" disabled>
-                <Loading size="sm" text="Checking..." />
-            </Button>
-        );
-    }
 
     if (hasApplied) {
         return (
